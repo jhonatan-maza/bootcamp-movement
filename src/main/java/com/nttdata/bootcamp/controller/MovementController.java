@@ -23,7 +23,7 @@ public class MovementController {
 
 
 	//Transfer search
-	@GetMapping("/")
+	@GetMapping("/findAllMovements")
 	public Flux<Movement> findAllMovements() {
 		Flux<Movement> movementsFlux = movementService.findAll();
 		LOGGER.info("Registered movements: " + movementsFlux);
@@ -40,7 +40,7 @@ public class MovementController {
 
 	//Transfer  by transactionNumber
 	@CircuitBreaker(name = "movement", fallbackMethod = "fallBackGetMovement")
-	@GetMapping("/findByMovementNumber/{numberTransfer}")
+	@GetMapping("/findByMovementNumber/{numberMovement}")
 	public Mono<Movement> findByMovementNumber(@PathVariable("numberMovement") String numberMovement) {
 		LOGGER.info("Searching Movement by number: " + numberMovement);
 		return movementService.findByNumber(numberMovement);
@@ -48,12 +48,13 @@ public class MovementController {
 
 	//Save Transfer
 	@CircuitBreaker(name = "movement", fallbackMethod = "fallBackGetMovement")
-	@PostMapping(value = "/saveMovement")
+	@PostMapping(value = "/saveMovement/{typeMovement}")
 	public Mono<Movement> saveMovement(@RequestBody Movement dataMovement, @PathVariable("typeMovement") String typeMovement){
 		Mono.just(dataMovement).doOnNext(t -> {
 
 					t.setCreationDate(new Date());
 					t.setModificationDate(new Date());
+					t.setTypeMovement(typeMovement);
 
 				}).onErrorReturn(dataMovement).onErrorResume(e -> Mono.just(dataMovement))
 				.onErrorMap(f -> new InterruptedException(f.getMessage())).subscribe(x -> LOGGER.info(x.toString()));

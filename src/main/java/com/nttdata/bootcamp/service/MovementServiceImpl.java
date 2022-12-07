@@ -31,7 +31,7 @@ public class MovementServiceImpl implements MovementService {
     public Mono<Movement> findByNumber(String Number) {
         Mono<Movement> movementsMono = movementRepository
                 .findAll()
-                .filter(x -> x.getAccountNumber().equals(Number))
+                .filter(x -> x.getMovementNumber().equals(Number))
                 .next();
         return movementsMono;
     }
