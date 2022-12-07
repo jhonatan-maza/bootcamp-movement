@@ -17,7 +17,7 @@ import java.util.Date;
 @NoArgsConstructor
 @ToString
 @Document(collection = "movement")
-public class Movements {
+public class Movement {
 
     @Id
     private String id;

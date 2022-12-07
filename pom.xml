@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.nttdata.bootcamp</groupId>
-	<artifactId>bootcamp-movements</artifactId>
+	<artifactId>bootcamp-movement</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>bootcamp-movements</name>
+	<name>bootcamp-movement</name>
 	<description>Microservicios</description>
 	<properties>
 		<java.version>11</java.version>

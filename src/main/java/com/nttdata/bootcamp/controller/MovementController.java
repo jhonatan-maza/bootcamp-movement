@@ -1,6 +1,6 @@
 package com.nttdata.bootcamp.controller;
 
-import com.nttdata.bootcamp.entity.Movements;
+import com.nttdata.bootcamp.entity.Movement;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,16 +24,16 @@ public class MovementController {
 
 	//Transfer search
 	@GetMapping("/")
-	public Flux<Movements> findAllMovements() {
-		Flux<Movements> movementsFlux = movementService.findAll();
+	public Flux<Movement> findAllMovements() {
+		Flux<Movement> movementsFlux = movementService.findAll();
 		LOGGER.info("Registered movements: " + movementsFlux);
 		return movementsFlux;
 	}
 
 	//Transfer by AccountNumber
 	@GetMapping("/findAllMovementsByNumber/{accountNumber}")
-	public Flux<Movements> findAllMovementsByNumber(@PathVariable("accountNumber") String accountNumber) {
-		Flux<Movements> movementsFlux = movementService.findByAccountNumber(accountNumber);
+	public Flux<Movement> findAllMovementsByNumber(@PathVariable("accountNumber") String accountNumber) {
+		Flux<Movement> movementsFlux = movementService.findByAccountNumber(accountNumber);
 		LOGGER.info("Registered movements of account number: "+accountNumber +"-" + movementsFlux);
 		return movementsFlux;
 	}
@@ -41,7 +41,7 @@ public class MovementController {
 	//Transfer  by transactionNumber
 	@CircuitBreaker(name = "movement", fallbackMethod = "fallBackGetMovement")
 	@GetMapping("/findByMovementNumber/{numberTransfer}")
-	public Mono<Movements> findByMovementNumber(@PathVariable("numberMovement") String numberMovement) {
+	public Mono<Movement> findByMovementNumber(@PathVariable("numberMovement") String numberMovement) {
 		LOGGER.info("Searching Movement by number: " + numberMovement);
 		return movementService.findByNumber(numberMovement);
 	}
@@ -49,46 +49,46 @@ public class MovementController {
 	//Save Transfer
 	@CircuitBreaker(name = "movement", fallbackMethod = "fallBackGetMovement")
 	@PostMapping(value = "/saveMovement")
-	public Mono<Movements> saveMovement(@RequestBody Movements dataMovements, @PathVariable("typeMovement") String typeMovement){
-		Mono.just(dataMovements).doOnNext(t -> {
+	public Mono<Movement> saveMovement(@RequestBody Movement dataMovement, @PathVariable("typeMovement") String typeMovement){
+		Mono.just(dataMovement).doOnNext(t -> {
 
 					t.setCreationDate(new Date());
 					t.setModificationDate(new Date());
 
-				}).onErrorReturn(dataMovements).onErrorResume(e -> Mono.just(dataMovements))
+				}).onErrorReturn(dataMovement).onErrorResume(e -> Mono.just(dataMovement))
 				.onErrorMap(f -> new InterruptedException(f.getMessage())).subscribe(x -> LOGGER.info(x.toString()));
 
-		Mono<Movements> movementsMono = movementService.saveMovement(dataMovements);
+		Mono<Movement> movementsMono = movementService.saveMovement(dataMovement);
 		return movementsMono;
 	}
 
 	@PostMapping(value = "/saveTransactionOrigin")
-	public Mono<Movements> saveTransactionOrigin(@RequestBody Movements dataMovements){
-		Mono.just(dataMovements).doOnNext(t -> {
+	public Mono<Movement> saveTransactionOrigin(@RequestBody Movement dataMovement){
+		Mono.just(dataMovement).doOnNext(t -> {
 
 					t.setCreationDate(new Date());
 					t.setModificationDate(new Date());
 					t.setTypeMovement("Transfer");
 
-				}).onErrorReturn(dataMovements).onErrorResume(e -> Mono.just(dataMovements))
+				}).onErrorReturn(dataMovement).onErrorResume(e -> Mono.just(dataMovement))
 				.onErrorMap(f -> new InterruptedException(f.getMessage())).subscribe(x -> LOGGER.info(x.toString()));
 
-		Mono<Movements> movementsMono = movementService.saveMovement(dataMovements);
+		Mono<Movement> movementsMono = movementService.saveMovement(dataMovement);
 		return movementsMono;
 	}
 
 	@PostMapping(value = "/saveTransactionDestination")
-	public Mono<Movements> saveTransactionDestination(@RequestBody Movements dataMovements){
-		Mono.just(dataMovements).doOnNext(t -> {
+	public Mono<Movement> saveTransactionDestination(@RequestBody Movement dataMovement){
+		Mono.just(dataMovement).doOnNext(t -> {
 
 					t.setCreationDate(new Date());
 					t.setModificationDate(new Date());
 					t.setTypeMovement("Transfer");
 
-				}).onErrorReturn(dataMovements).onErrorResume(e -> Mono.just(dataMovements))
+				}).onErrorReturn(dataMovement).onErrorResume(e -> Mono.just(dataMovement))
 				.onErrorMap(f -> new InterruptedException(f.getMessage())).subscribe(x -> LOGGER.info(x.toString()));
 
-		Mono<Movements> movementsMono = movementService.saveMovement(dataMovements);
+		Mono<Movement> movementsMono = movementService.saveMovement(dataMovement);
 		return movementsMono;
 	}
 
@@ -97,17 +97,17 @@ public class MovementController {
 	//Update Transfer
 	@CircuitBreaker(name = "movement", fallbackMethod = "fallBackGetMovement")
 	@PutMapping("/updateMovements/{numberMovement}")
-	public Mono<Movements> updateMovements(@PathVariable("numberTransfer") String numberMovements,
-										  @Valid @RequestBody Movements dataMovements) {
-		Mono.just(dataMovements).doOnNext(t -> {
+	public Mono<Movement> updateMovements(@PathVariable("numberTransfer") String numberMovements,
+										  @Valid @RequestBody Movement dataMovement) {
+		Mono.just(dataMovement).doOnNext(t -> {
 
 					t.setMovementNumber(numberMovements);
 					t.setModificationDate(new Date());
 
-				}).onErrorReturn(dataMovements).onErrorResume(e -> Mono.just(dataMovements))
+				}).onErrorReturn(dataMovement).onErrorResume(e -> Mono.just(dataMovement))
 				.onErrorMap(f -> new InterruptedException(f.getMessage())).subscribe(x -> LOGGER.info(x.toString()));
 
-		Mono<Movements> updateTransfer = movementService.updateMovement(dataMovements);
+		Mono<Movement> updateTransfer = movementService.updateMovement(dataMovement);
 		return updateTransfer;
 	}
 
@@ -122,9 +122,9 @@ public class MovementController {
 
 	}
 
-	private Mono<Movements> fallBackGetMovement(Exception e){
-		Movements movements = new Movements();
-		Mono<Movements> movementsMono= Mono.just(movements);
+	private Mono<Movement> fallBackGetMovement(Exception e){
+		Movement movement = new Movement();
+		Mono<Movement> movementsMono= Mono.just(movement);
 		return movementsMono;
 	}
 
